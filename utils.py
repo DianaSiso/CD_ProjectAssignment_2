@@ -10,27 +10,25 @@ def dht_hash(text, seed=0, maximum=2**10):
 
 
 def contains_predecessor(identification, predecessor, node):
-    """ Check node (id) is contained between predecessor and identification."""
-    #TODO
     if (predecessor == node):
         return True
 
     if (identification - predecessor > 0):
         if (node > predecessor) and (node < identification):
             return True
-    else:                                           #here we have 2 options, node is after 0 or node is before 0
+    else:                                           
         if (node > predecessor) or (node < identification):
             return True
     return False
 
 def contains_successor(identification, successor, node):
-    """ Check node (id) is contained between identification and successor."""
-    #TODO
-
-    if ((identification - successor) < 0): #458 - 123
-        if (node < successor and node > identification):    #123 - 867
+    if (successor == node):
+        return True
+    
+    if ((identification - successor) < 0): 
+        if (node < successor and node > identification):    
             return True
     else:
-         if (node < successor) or (node > identification):
+        if (node < successor) or (node > identification):
              return True
     return False
