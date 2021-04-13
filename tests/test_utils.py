@@ -6,7 +6,7 @@ from utils import contains_predecessor, contains_successor
 def test_contains_predecessor():
     #identification, predecessor, node
     assert contains_predecessor(100, 200, 300)
-    assert not contains_predecessor(300, 400, 100)
+    assert contains_predecessor(300, 400, 100)
 
 def test_contains_successor():
     #identification, successor, node
