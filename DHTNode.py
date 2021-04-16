@@ -3,7 +3,7 @@ import socket
 import threading
 import logging
 import pickle
-from utils import dht_hash, contains_predecessor, contains_successor
+from utils import dht_hash, contains
 
 
 class FingerTable:
@@ -104,7 +104,7 @@ class DHTNode(threading.Thread):
             #TODO update finger table
             args = {"successor_id": self.identification, "successor_addr": self.addr}
             self.send(addr, {"method": "JOIN_REP", "args": args})
-        elif contains_successor(self.identification, self.successor_id, identification):
+        elif contains(self.identification, self.successor_id, identification):
             args = {
                 "successor_id": self.successor_id,
                 "successor_addr": self.successor_addr,
@@ -138,8 +138,8 @@ class DHTNode(threading.Thread):
         """
 
         self.logger.debug("Notify: %s", args)
-        if self.predecessor_id is None or contains_predecessor(
-            self.identification, self.predecessor_id, args["predecessor_id"]
+        if self.predecessor_id is None or contains(
+            self.predecessor_id, self.identification, args["predecessor_id"]
         ):
             self.predecessor_id = args["predecessor_id"]
             self.predecessor_addr = args["predecessor_addr"]
@@ -155,7 +155,7 @@ class DHTNode(threading.Thread):
         """
 
         self.logger.debug("Stabilize: %s %s", from_id, addr)
-        if from_id is not None and contains_successor(
+        if from_id is not None and contains(
             self.identification, self.successor_id, from_id
         ):
             # Update our successor
@@ -181,7 +181,7 @@ class DHTNode(threading.Thread):
         self.logger.debug("Put: %s %s", key, key_hash)
 
         #TODO Replace next code:
-        self.send(address, {"method": "ACK"})
+        self.send(address, {"method": "NACK"})
 
 
     def get(self, key, address):
@@ -195,7 +195,7 @@ class DHTNode(threading.Thread):
         self.logger.debug("Get: %s %s", key, key_hash)
 
         #TODO Replace next code:
-        self.send(address, {"method": "ACK"})
+        self.send(address, {"method": "NACK"})
 
 
     def run(self):

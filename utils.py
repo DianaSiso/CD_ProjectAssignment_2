@@ -9,26 +9,7 @@ def dht_hash(text, seed=0, maximum=2**10):
     return h % maximum
 
 
-def contains_predecessor(identification, predecessor, node):
-    if (predecessor == node):
-        return True
-
-    if (identification - predecessor > 0):
-        if (node > predecessor) and (node < identification):
-            return True
-    else:                                           
-        if (node > predecessor) or (node < identification):
-            return True
-    return False
-
-def contains_successor(identification, successor, node):
-    if (successor == node):
-        return True
-    
-    if ((identification - successor) < 0): 
-        if (node < successor and node > identification):    
-            return True
-    else:
-        if (node < successor) or (node > identification):
-             return True
+def contains(begin, end, node):
+    """Check node is contained between begin and end in a ring."""
+    #TODO
     return False
