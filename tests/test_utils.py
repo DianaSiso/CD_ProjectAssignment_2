@@ -1,15 +1,18 @@
 """Tests two clients."""
 import pytest
-from utils import contains_predecessor, contains_successor
+from utils import contains
 
 
-def test_contains_predecessor():
-    #identification, predecessor, node
-    assert contains_predecessor(100, 200, 300)
-    assert contains_predecessor(300, 400, 100)
+def test_contains():
+    #begin, end, node
+    assert contains(100, 300, 200)
+    assert not contains(100, 300, 100)
+    assert not contains(100, 300, 400)
+    assert not contains(100, 300, 0)
+    assert not contains(100, 300, 900)
 
-def test_contains_successor():
-    #identification, successor, node
-    assert contains_successor(100, 300, 200)
-    assert contains_successor(300, 200, 100)
-    assert not contains_successor(300, 100, 100)
+
+    assert contains(800, 300, 900)
+    assert contains(800, 300, 200)
+    assert not contains(800, 300, 700)
+    assert not contains(800, 300, 400)
