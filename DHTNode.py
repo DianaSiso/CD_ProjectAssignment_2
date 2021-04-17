@@ -181,6 +181,7 @@ class DHTNode(threading.Thread):
         self.logger.debug("Put: %s %s", key, key_hash)
 
         #TODO Replace next code:
+               
         self.send(address, {"method": "NACK"})
 
 
@@ -193,7 +194,7 @@ class DHTNode(threading.Thread):
         """
         key_hash = dht_hash(key)
         self.logger.debug("Get: %s %s", key, key_hash)
-
+        print(key_hash)
         #TODO Replace next code:
         self.send(address, {"method": "NACK"})
 
