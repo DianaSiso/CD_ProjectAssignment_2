@@ -65,7 +65,8 @@ class DHTNode(threading.Thread):
             self.predecessor_id = None
             self.predecessor_addr = None
 
-        self.finger_table = None    #TODO create finger_table
+        self.finger_table = {}    #TODO create finger_table
+        #empty finger table
 
         self.keystore = {}  # Where all data is stored
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -102,9 +103,12 @@ class DHTNode(threading.Thread):
             self.successor_id = identification
             self.successor_addr = addr
             #TODO update finger table
+            self.finger_table[identification]={}
+            #a unica entrada da finger table aponta para este mesmo nó
             args = {"successor_id": self.identification, "successor_addr": self.addr}
             self.send(addr, {"method": "JOIN_REP", "args": args})
         elif contains(self.identification, self.successor_id, identification):
+            #contains(begin,end,node)
             args = {
                 "successor_id": self.successor_id,
                 "successor_addr": self.successor_addr,
@@ -112,6 +116,7 @@ class DHTNode(threading.Thread):
             self.successor_id = identification
             self.successor_addr = addr
             #TODO update finger table
+            self.finger_table[identification]={} #criamos um dicionario para este nó
             self.send(addr, {"method": "JOIN_REP", "args": args})
         else:
             self.logger.debug("Find Successor(%d)", args["id"])
