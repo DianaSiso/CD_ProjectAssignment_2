@@ -177,13 +177,14 @@ class DHTNode(threading.Thread):
         value: data to be stored
         address: address where to send ack/nack
         """
-        key_hash = dht_hash(key)
+        key_hash = dht_hash(key)        #de 0-1023
         self.logger.debug("Put: %s %s", key, key_hash)
 
-        #TODO Replace next code:
-               
-        self.send(address, {"method": "NACK"})
-
+        if not (contains(self.predecessor_id, self.identification, key_hash)):
+            self.send(self.successor_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
+        else:
+            self.keystore[key] = value
+            self.send(address, {"method": "ACK"})
 
     def get(self, key, address):
         """Retrieve value from DHT.
@@ -194,9 +195,11 @@ class DHTNode(threading.Thread):
         """
         key_hash = dht_hash(key)
         self.logger.debug("Get: %s %s", key, key_hash)
-        print(key_hash)
-        #TODO Replace next code:
-        self.send(address, {"method": "NACK"})
+        
+        if not (contains(self.predecessor_id, self.identification, key_hash)):
+            self.send(self.successor_addr, {"method": "GET", "args" : {"key": key, "from": address}})
+        else:
+            self.send(address, {"method": "ACK", "args" : self.keystore[key]})
 
 
     def run(self):
