@@ -13,9 +13,9 @@ def contains(begin, end, node):
     """Check node is contained between begin and end in a ring."""
     #TODO
     if (begin < end):
-        if (begin < node < end):
+        if (begin < node <= end):
             return True
     else:
-        if (node < end or node > begin):    
+        if (node <= end or node > begin):    
             return True
     return False
