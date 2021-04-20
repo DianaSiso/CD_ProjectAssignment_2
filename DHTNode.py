@@ -35,6 +35,13 @@ class FingerTable:
     def __repr__(self):
         pass
 
+    @property
+    def as_list(self):
+        """return the finger table as a list of tuples: (identifier, (host, port)).
+        NOTE: list index 0 corresponds to finger_table index 1
+        """
+        pass
+
 class DHTNode(threading.Thread):
     """ DHT Node Agent. """
 
