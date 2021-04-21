@@ -11,10 +11,16 @@ class FingerTable:
 
     def __init__(self, node_id, node_addr, m_bits=10):
         """ Initialize Finger Table."""
+        for i in range (0,m_bits,1):
+            if (node_id + 2^(i+1) < 1024):
+                self.finger_table[i] = ("null", "null")
+        
         pass
 
     def fill(self, node_id, node_addr):
         """ Fill all entries of finger_table with node_id, node_addr."""
+        for i in range (0,len(self.finger_table),1):
+            self.finger_table[i] = (node_id, node_addr)
         pass
 
     def update(self, index, node_id, node_addr):
@@ -72,7 +78,7 @@ class DHTNode(threading.Thread):
             self.predecessor_id = None
             self.predecessor_addr = None
 
-        self.finger_table = {}    #TODO create finger_table
+        self.finger_table = []    #TODO create finger_table
         #empty finger table
 
         self.keystore = {}  # Where all data is stored
@@ -110,7 +116,12 @@ class DHTNode(threading.Thread):
             self.successor_id = identification
             self.successor_addr = addr
             #TODO update finger table
-            self.finger_table[identification]={}
+            for i in range (1, 11, 1):
+                value = identification + 2^i
+                if value < 1024:
+                    self.finger_table[i-1] = [self.successor_addr]  #não há mais nenhum nó então ele vai ser sempre o sucessor para qualquer 2^i
+
+            self.finger_table={}
             #a unica entrada da finger table aponta para este mesmo nó
             args = {"successor_id": self.identification, "successor_addr": self.addr}
             self.send(addr, {"method": "JOIN_REP", "args": args})
@@ -123,7 +134,12 @@ class DHTNode(threading.Thread):
             self.successor_id = identification
             self.successor_addr = addr
             #TODO update finger table
-            self.finger_table[identification]={} #criamos um dicionario para este nó
+
+            for i in range(1, 11, 1):
+                value = identification + 2^i
+                if value < 1024:
+                    self.finger_table[i-1] = [args["sucessor_addr"]]  
+
             self.send(addr, {"method": "JOIN_REP", "args": args})
         else:
             self.logger.debug("Find Successor(%d)", args["id"])
@@ -139,6 +155,10 @@ class DHTNode(threading.Thread):
 
         self.logger.debug("Get successor: %s", args)
         #TODO Implement processing of SUCCESSOR message
+        if (contains(args["id"]))
+
+        #self.send(self.successor_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
+        
         pass
                 
     def notify(self, args):
