@@ -28,7 +28,7 @@ class FingerTable:
         pass
 
     def find(self, identification):
-        """ Get successor node address. """
+        """ Get node address of closest preceding node (in finger table) of identification. """
         pass
 
     def refresh(self):
