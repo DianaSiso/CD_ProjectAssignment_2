@@ -46,7 +46,7 @@ jobs:
       
       - name: Launch DHT into background
         run: |
-          python3 DHT.py savelog &
+          python3 DHT.py --savelog &
           PID=$!
           sleep 1
           ps -p $PID > /dev/null
@@ -54,7 +54,7 @@ jobs:
       - name: Test with pytest
         timeout-minutes: 2
         run: |
-          sleep 10
+          sleep 7
           pytest
 
       - name: DHT Logs
