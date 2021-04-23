@@ -8,7 +8,7 @@ from utils import dht_hash, contains
 
 class FingerTable:
     """Finger Table."""
-
+    
     def __init__(self, node_id, node_addr, m_bits=10):
         """ Initialize Finger Table."""
         for i in range (0,m_bits,1):
@@ -30,24 +30,29 @@ class FingerTable:
         """ Get node address of closest preceding node (in finger table) of identification. """
         res=2^len(self.finger_table)
         for i in range (0,len(self.finger_table),1):
-            #if self.finger_table[i][0]>identification:
-                
+            if self.finger_table[i][0]>identification: #procuramos o primeiro elemento superior ao procurado
+                if i>0: #se o elemento nao estiver na primeira posicao da ft
+                    return self.finger_table[i-1][1] #retornamos o addr do elemento precedente 
+                else: #se for o primeiro da ft
+                    return self.finger_table[i][1] #retornamos o addr desse
+        return self.finger_table[len(self.finger_table)-1][1] #se chegarmos aqui é pq nenhuma entrada da ft é 
+        #maior que o elemento a encontrar logo retornamos o ultimo addr da ft
         pass
-
+    
     def refresh(self):
         """ Retrieve finger table entries."""
         #vamos retornar os ids que precisam de ser refrescados
         #para cada um enviamos a mensagem succ rep, para alterar a tabela 
-        for i in range(0,len(self.finger_table),1):
-            if self.finger_table[i][0]!=self.identification+2^i
+        #for i in range(0,len(self.finger_table),1):
+            #if self.finger_table[i][0]!=self.identification+2^i:
                 #self.finger_table[i][0]=self.identification+2^i
-                args = {"req_id": i, "successor_id": self.identification+2^i,self.finger_table[i][1]}
-                self.send(address, {"method": "SUCCESSOR_REP", "args" : args})
+                #args = {"req_id": i, "successor_id": self.identification+2^i,self.finger_table[i][1]}
+                #self.send(address, {"method": "SUCCESSOR_REP", "args" : args})
         pass
 
     def getIdxFromId(self, id):
         for i in range (0,len(self.finger_table),1):
-            if self.identification+2^i==id
+            if self.identification+2^i==id:
                 return i+1
         return 0
         
