@@ -11,6 +11,7 @@ class FingerTable:
     
     def __init__(self, node_id, node_addr, m_bits=10):
         """ Initialize Finger Table."""
+        self.finger_table=[None]*m_bits
         for i in range (0,m_bits,1):
             self.finger_table[i] = ((node_id+2^i)%(2^len(self.finger_table)), node_addr)
         pass
