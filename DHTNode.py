@@ -11,6 +11,7 @@ class FingerTable:
     
     def __init__(self, node_id, node_addr, m_bits=10):
         """ Initialize Finger Table."""
+        self.identification=node_id
         self.finger_table=[None]*m_bits
         for i in range (0,m_bits,1):     
             self.finger_table[i] = ((node_id+2**i)%(2**m_bits), node_addr) #descobri que o simbolo da potencia é ** e nao ^
@@ -45,8 +46,8 @@ class FingerTable:
         #vamos retornar os ids que precisam de ser refrescados
         #para cada um enviamos a mensagem succ rep, para alterar a tabela 
         #for i in range(0,len(self.finger_table),1):
-        #    if self.finger_table[i][0]!=self.identification+2**i:
-        #        self.finger_table[i][0]=self.identification+2**i
+        #    if self.finger_table[i][0]!=(self.identification+2**i)%(2**len(self.finger_table)):
+        #        self.finger_table[i]=((self.identification+2**i)%(2**len(self.finger_table)),self.finger_table[i][1])
                 #args = {"req_id": i, "successor_id": self.identification+2^i,self.finger_table[i][1]}
                 #self.send(address, {"method": "SUCCESSOR_REP", "args" : args})
         pass
@@ -67,6 +68,7 @@ class FingerTable:
         """return the finger table as a list of tuples: (identifier, (host, port)).
         NOTE: list index 0 corresponds to finger_table index 1
         """
+        
 
         pass
 
