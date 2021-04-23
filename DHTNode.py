@@ -17,8 +17,8 @@ class FingerTable:
 
     def fill(self, node_id, node_addr):
         """ Fill all entries of finger_table with node_id, node_addr."""
-        pos= getIdxFromId(node_id)-1
-        self.finger_table[pos]=(node_id,node_addr)
+        for i in range (0,len(self.finger_table),1):
+            self.finger_table[i] = (node_id, node_addr)
         pass
 
     def update(self, index, node_id, node_addr):
