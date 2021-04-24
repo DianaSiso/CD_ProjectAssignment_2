@@ -72,8 +72,9 @@ class FingerTable:
         NOTE: list index 0 corresponds to finger_table index 1
         """
         return self.finger_table
-            
-        
+        pass
+    def __str__(self):
+        return str(self.finger_table)
         pass
 
 class DHTNode(threading.Thread):
@@ -108,7 +109,7 @@ class DHTNode(threading.Thread):
 
         self.finger_table=FingerTable(self.identification, self.addr)    #TODO create finger_table
         #empty finger table
-
+        print(self.finger_table.__str__())
         self.keystore = {}  # Where all data is stored
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.settimeout(timeout)
@@ -315,19 +316,14 @@ class DHTNode(threading.Thread):
                 self.send(self.successor_addr, {"method": "PREDECESSOR"})
 
     def __str__(self):
-        st= "Node ID: {}; DHT: {}; Successor: {}; Predecessor: {}; FingerTable: {}".format(
+        return "Node ID: {}; DHT: {}; Successor: {}; Predecessor: {}; FingerTable: {}".format(
             self.identification,
             self.inside_dht,
             self.successor_id,
             self.predecessor_id,
             self.finger_table,
         )
-        print(" ")
-        print(" ")
-        print(" ")
-        print(" ")
-        print(type(st))
-        return st
+        
 
     def __repr__(self):
         return self.__str__()
