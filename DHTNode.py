@@ -45,11 +45,14 @@ class FingerTable:
         """ Retrieve finger table entries."""
         #vamos retornar os ids que precisam de ser refrescados
         #para cada um enviamos a mensagem succ rep, para alterar a tabela 
-        #for i in range(0,len(self.finger_table),1):
-        #    if self.finger_table[i][0]!=(self.identification+2**i)%(2**len(self.finger_table)):
-        #        self.finger_table[i]=((self.identification+2**i)%(2**len(self.finger_table)),self.finger_table[i][1])
-                #args = {"req_id": i, "successor_id": self.identification+2^i,self.finger_table[i][1]}
-                #self.send(address, {"method": "SUCCESSOR_REP", "args" : args})
+        lista=[]
+        count=0
+        for i in range(0,len(self.finger_table),1):
+            if self.finger_table[i][0]!=(self.identification+2**i)%(2**len(self.finger_table)):
+                lista.append((i+1,(self.identification+2**i)%(2**len(self.finger_table)),self.finger_table[i][1]))
+            else:
+                lista.append((i+1,self.finger_table[i][0],self.finger_table[i][1]))   
+        return lista        
         pass
 
     def getIdxFromId(self, id):
@@ -68,8 +71,9 @@ class FingerTable:
         """return the finger table as a list of tuples: (identifier, (host, port)).
         NOTE: list index 0 corresponds to finger_table index 1
         """
+        return self.finger_table
+            
         
-
         pass
 
 class DHTNode(threading.Thread):
@@ -213,7 +217,12 @@ class DHTNode(threading.Thread):
         self.send(self.successor_addr, {"method": "NOTIFY", "args": args})
 
         # TODO refresh finger_table
-
+        lista= self.finger_table.refresh()
+        for i in range (0,len(lista),1):
+            args = {"req_id": lista[i][0], "successor_id": lista[i][1], "successor_addr": lista[i][2]}
+            self.send(addr, {"method": "SUCCESSOR_REP", "args" : args})
+        #percorrer lista
+        #enviamos mensagem para cada elemento
     def put(self, key, value, address):
         """Store value in DHT.
 
@@ -299,20 +308,26 @@ class DHTNode(threading.Thread):
                     self.stabilize(output["args"], addr)
                 elif output["method"] == "SUCCESSOR_REP":
                     #TODO Implement processing of SUCCESSOR_REP
-                    self.finger_table.update(output["args"]["req_id"],output["args"]["succ_id"],output["args"]["succ_addr"])
+                    self.finger_table.update(output["args"]["req_id"],output["args"]["successor_id"],output["args"]["successor_addr"])
                     pass
             else:  # timeout occurred, lets run the stabilize algorithm
                 # Ask successor for predecessor, to start the stabilize process
                 self.send(self.successor_addr, {"method": "PREDECESSOR"})
 
     def __str__(self):
-        return "Node ID: {}; DHT: {}; Successor: {}; Predecessor: {}; FingerTable: {}".format(
+        st= "Node ID: {}; DHT: {}; Successor: {}; Predecessor: {}; FingerTable: {}".format(
             self.identification,
             self.inside_dht,
             self.successor_id,
             self.predecessor_id,
             self.finger_table,
         )
+        print(" ")
+        print(" ")
+        print(" ")
+        print(" ")
+        print(type(st))
+        return st
 
     def __repr__(self):
         return self.__str__()
