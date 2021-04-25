@@ -234,7 +234,7 @@ class DHTNode(threading.Thread):
         """
         key_hash = dht_hash(key)        #de 0-1023
         self.logger.debug("Put: %s %s", key, key_hash)
-
+    
         if not (contains(self.predecessor_id, self.identification, key_hash)):
             self.send(self.successor_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
         else:
