@@ -71,6 +71,7 @@ class FingerTable:
         """return the finger table as a list of tuples: (identifier, (host, port)).
         NOTE: list index 0 corresponds to finger_table index 1
         """
+       
         return self.finger_table
         pass
     def __str__(self):
@@ -107,7 +108,7 @@ class DHTNode(threading.Thread):
             self.predecessor_id = None
             self.predecessor_addr = None
 
-        self.finger_table=FingerTable(self.identification, self.successor_addr)    #TODO create finger_table
+        self.finger_table=FingerTable(self.successor_id, self.successor_addr)    #TODO create finger_table
         #empty finger table
         print(self.finger_table.__str__())
         self.keystore = {}  # Where all data is stored
@@ -145,7 +146,7 @@ class DHTNode(threading.Thread):
             self.successor_id = identification
             self.successor_addr = addr
             #TODO update finger table
-            self.finger_table.fill(self.identification,self.addr)
+            self.finger_table.fill(self.successor_id,self.successor_addr)
             args = {"successor_id": self.identification, "successor_addr": self.addr}
             self.send(addr, {"method": "JOIN_REP", "args": args})
         elif contains(self.identification, self.successor_id, identification):
@@ -175,22 +176,8 @@ class DHTNode(threading.Thread):
 
         self.logger.debug("Get successor: %s", args)
         #TODO Implement processing of SUCCESSOR message
-        if (contains(self.predecessor_id,self.identification,args["id"])):
-            argst = {"req_id": args["id"], "successor_id": self.identification, "successor_addr": self.addr}
-            print()
-            print()
-            print()
-            print()
-            print()
-            print()
-            print(args)
-            print()
-            print()
-            print()
-            print()
-            print()
-            print()
-            print()
+        if (contains(self.identification,self.successor_id,args["id"])):
+            argst = {"req_id": args["id"], "successor_id": self.successor_id, "successor_addr": self.successor_addr}
             self.send(args["addr"], {"method": "SUCCESSOR_REP", "args" : argst})
         else:
             self.send(self.successor_addr,{"method": "SUCCESSOR", "args" :args})
@@ -230,7 +217,7 @@ class DHTNode(threading.Thread):
             self.successor_id = from_id
             self.successor_addr = addr
             #TODO update finger table
-            self.finger_table.update()
+            #self.finger_table.update()
         # notify successor of our existence, so it can update its predecessor record
         args = {"predecessor_id": self.identification, "predecessor_addr": self.addr}
         self.send(self.successor_addr, {"method": "NOTIFY", "args": args})
@@ -253,7 +240,7 @@ class DHTNode(threading.Thread):
         key_hash = dht_hash(key)        #de 0-1023
         self.logger.debug("Put: %s %s", key, key_hash)
     
-        if not (contains(self.predecessor_id, self.identification, key_hash)):
+        if not (contains(self.identification, self.successor_id, key_hash)):
             self.send(self.successor_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
         else:
             self.keystore[key] = value
@@ -269,7 +256,7 @@ class DHTNode(threading.Thread):
         key_hash = dht_hash(key)
         self.logger.debug("Get: %s %s", key, key_hash)
         
-        if not (contains(self.predecessor_id, self.identification, key_hash)):
+        if not (contains(self.identification, self.successor_id, key_hash)):
             self.send(self.successor_addr, {"method": "GET", "args" : {"key": key, "from": address}})
         else:
             self.send(address, {"method": "ACK", "args" : self.keystore[key]})
@@ -327,10 +314,7 @@ class DHTNode(threading.Thread):
                     self.stabilize(output["args"], addr)
                 elif output["method"] == "SUCCESSOR_REP":
                     #TODO Implement processing of SUCCESSOR_REP
-                    lista=[]
-                    for i in range(0,len(self.finger_table),1):
-                        lista.append((output["req_id"]+2**i)%(len(self.finger_table)))
-                    idx
+                    idx=self.finger_table.getIdxFromId(output["args"]["req_id"])
                     self.finger_table.update(idx,output["args"]["successor_id"],output["args"]["successor_addr"])
                     
                     pass
