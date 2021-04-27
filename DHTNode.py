@@ -13,7 +13,7 @@ class FingerTable:
         """ Initialize Finger Table."""
         self.identification=node_id
         self.finger_table=[None]*m_bits
-        for i in range (0,m_bits,1):     
+        for i in range (0,m_bits,1): 
             self.finger_table[i] = ((node_id+2**i)%(2**m_bits), node_addr) 
         pass
 
@@ -56,10 +56,11 @@ class FingerTable:
         pass
 
     def getIdxFromId(self, id):
+        lista=[]
         for i in range (0,len(self.finger_table),1):
             if self.finger_table[i][0]==id:
-                return (i+1)
-        return 0
+                lista.append(i+1)
+        return lista
         
         pass
 
@@ -108,9 +109,8 @@ class DHTNode(threading.Thread):
             self.predecessor_id = None
             self.predecessor_addr = None
 
-        self.finger_table=FingerTable(self.successor_id, self.successor_addr)    #TODO create finger_table
+        self.finger_table=FingerTable(self.identification, self.addr)    #TODO create finger_table
         #empty finger table
-        print(self.finger_table.__str__())
         self.keystore = {}  # Where all data is stored
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.settimeout(timeout)
@@ -217,6 +217,9 @@ class DHTNode(threading.Thread):
             self.successor_id = from_id
             self.successor_addr = addr
             #TODO update finger table
+            idx=self.finger_table.getIdxFromId(self.identification)
+            for i in range(0,len(idx),1):
+                self.finger_table.update(idx[i],self.successor_id,self.successor_addr)
             #self.finger_table.update()
         # notify successor of our existence, so it can update its predecessor record
         args = {"predecessor_id": self.identification, "predecessor_addr": self.addr}
@@ -240,7 +243,7 @@ class DHTNode(threading.Thread):
         key_hash = dht_hash(key)        #de 0-1023
         self.logger.debug("Put: %s %s", key, key_hash)
     
-        if not (contains(self.identification, self.successor_id, key_hash)):
+        if not (contains(self.predecessor_id, self.identification, key_hash)):
             self.send(self.successor_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
         else:
             self.keystore[key] = value
@@ -315,7 +318,8 @@ class DHTNode(threading.Thread):
                 elif output["method"] == "SUCCESSOR_REP":
                     #TODO Implement processing of SUCCESSOR_REP
                     idx=self.finger_table.getIdxFromId(output["args"]["req_id"])
-                    self.finger_table.update(idx,output["args"]["successor_id"],output["args"]["successor_addr"])
+                    for i in range(0,len(idx),1):
+                        self.finger_table.update(idx[i],output["args"]["successor_id"],output["args"]["successor_addr"])
                     
                     pass
             else:  # timeout occurred, lets run the stabilize algorithm
