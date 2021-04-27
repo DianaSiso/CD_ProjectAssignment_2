@@ -48,19 +48,16 @@ class FingerTable:
         #para cada um enviamos a mensagem succ rep, para alterar a tabela 
         lista=[]
         for i in range(0,len(self.finger_table),1):
-            if self.finger_table[i][0]!=(self.identification+2**i)%(2**len(self.finger_table)):
-                lista.append((i+1,(self.identification+2**i)%(2**len(self.finger_table)),self.finger_table[i][1]))
-            else:
-                lista.append((i+1,self.finger_table[i][0],self.finger_table[i][1]))   
+            lista.append((i+1,(self.identification+2**i)%(2**len(self.finger_table)),self.finger_table[i][1]))
         return lista        
         pass
 
     def getIdxFromId(self, id):
-        lista=[]
+        
         for i in range (0,len(self.finger_table),1):
-            if self.finger_table[i][0]==id:
-                lista.append(i+1)
-        return lista
+            if ((self.identification+2**i)%(2**len(self.finger_table)))==id:
+                return i+1
+       
         
         pass
 
@@ -170,7 +167,7 @@ class DHTNode(threading.Thread):
 
         Parameters:
             args (dict): addr and id of the node asking
-            {"id"=id; "from" addr}
+            {"id"=id; "addr" addr}
         """
         
 
@@ -218,8 +215,7 @@ class DHTNode(threading.Thread):
             self.successor_addr = addr
             #TODO update finger table
             idx=self.finger_table.getIdxFromId(self.identification)
-            for i in range(0,len(idx),1):
-                self.finger_table.update(idx[i],self.successor_id,self.successor_addr)
+            self.finger_table.update(idx,self.successor_id,self.successor_addr)
             #self.finger_table.update()
         # notify successor of our existence, so it can update its predecessor record
         args = {"predecessor_id": self.identification, "predecessor_addr": self.addr}
@@ -319,9 +315,22 @@ class DHTNode(threading.Thread):
                 elif output["method"] == "SUCCESSOR_REP":
                     #TODO Implement processing of SUCCESSOR_REP
                     idx=self.finger_table.getIdxFromId(output["args"]["req_id"])
-                    for i in range(0,len(idx),1):
-                        self.finger_table.update(idx[i],output["args"]["successor_id"],output["args"]["successor_addr"])
-                    
+                    self.finger_table.update(idx,output["args"]["successor_id"],output["args"]["successor_addr"])
+                    print()
+                    print()
+                    print()
+                    print()
+                    print(self.identification)
+                    print(output["args"]["req_id"])
+                    print(idx)
+                    print(self.finger_table)
+                    print()
+                    print()
+                    print()
+                    print()
+                    print()
+                    print()
+                    print()
                     pass
             else:  # timeout occurred, lets run the stabilize algorithm
                 # Ask successor for predecessor, to start the stabilize process
