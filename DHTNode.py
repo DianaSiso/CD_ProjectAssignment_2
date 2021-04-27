@@ -244,7 +244,8 @@ class DHTNode(threading.Thread):
         self.logger.debug("Put: %s %s", key, key_hash)
     
         if not (contains(self.predecessor_id, self.identification, key_hash)):
-            self.send(self.successor_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
+            s_addr=self.finger_table.find(key_hash)
+            self.send(s_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
         else:
             self.keystore[key] = value
             self.send(address, {"method": "ACK"})
@@ -259,7 +260,7 @@ class DHTNode(threading.Thread):
         key_hash = dht_hash(key)
         self.logger.debug("Get: %s %s", key, key_hash)
         
-        if not (contains(self.identification, self.successor_id, key_hash)):
+        if not (contains(self.predecessor_id, self.identification, key_hash)):
             self.send(self.successor_addr, {"method": "GET", "args" : {"key": key, "from": address}})
         else:
             self.send(address, {"method": "ACK", "args" : self.keystore[key]})
