@@ -32,22 +32,8 @@ class FingerTable:
     def find(self, identification):
         """ Get node address of closest preceding node (in finger table) of identification. """
         for i in range (0,len(self.finger_table)-1,1):
-            #if (i==(len(self.finger_table)-1)):
-             #   if contains(self.finger_table[i][0], self.finger_table[0][0], identification):
-              #      return self.finger_table[i][1]
-            #else:
             if contains(self.finger_table[i][0], self.finger_table[i+1][0], identification):
-                print(".........contem ........")
-                print(self.finger_table[i][0])
-                print(self.finger_table[i+1][0])
                 return self.finger_table[i][1]
-            print("......... nao contem ........")
-            print(self.finger_table[i][0], self.finger_table[i+1][0])
-            #if self.finger_table[i][0]>=identification: #procuramos o primeiro elemento superior ao procurado
-             #   if i>0: #se o elemento nao estiver na primeira posicao da ft
-              #      return self.finger_table[i-1][1] #retornamos o addr do elemento precedente 
-               # else: #se for o primeiro da ft
-                #    return self.finger_table[i][1] #retornamos o addr desse
         return self.finger_table[0][1] # retornamos o primeiro addr da ft
         pass
     
@@ -241,14 +227,6 @@ class DHTNode(threading.Thread):
     
         if not (contains(self.predecessor_id, self.identification, key_hash)):
             s_addr=self.finger_table.find(key_hash)
-            print("----------------------PUT--------------------------")
-            print(s_addr)
-            print()
-            print()
-            print()
-            print(self.finger_table)
-            print("---------------------PUT---------------------------")
-
             self.send(s_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
         else:
             self.keystore[key] = value
@@ -265,13 +243,6 @@ class DHTNode(threading.Thread):
         
         if not (contains(self.predecessor_id, self.identification, key_hash)):
             s_addr=self.finger_table.find(key_hash)
-            print("----------------------GET--------------------------")
-            print(s_addr)
-            print()
-            print()
-            print()
-            print(self.finger_table)
-            print("-----------------------GET-------------------------")
             self.send(s_addr, {"method": "GET", "args" : {"key": key, "from": address}})
         else:
             self.send(address, {"method": "ACK", "args" : self.keystore[key]})

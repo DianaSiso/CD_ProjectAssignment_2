@@ -18,7 +18,6 @@ def contains(begin, end, node):
         if (begin < node <= end):
             return True
     else:
-    #
         if (node <= end or node > begin):    
             return True
     return False
