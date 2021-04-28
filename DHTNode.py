@@ -37,15 +37,18 @@ class FingerTable:
               #      return self.finger_table[i][1]
             #else:
             if contains(self.finger_table[i][0], self.finger_table[i+1][0], identification):
+                print(".........contem ........")
+                print(self.finger_table[i][0])
+                print(self.finger_table[i+1][0])
                 return self.finger_table[i][1]
-
+            print("......... nao contem ........")
+            print(self.finger_table[i][0], self.finger_table[i+1][0])
             #if self.finger_table[i][0]>=identification: #procuramos o primeiro elemento superior ao procurado
              #   if i>0: #se o elemento nao estiver na primeira posicao da ft
               #      return self.finger_table[i-1][1] #retornamos o addr do elemento precedente 
                # else: #se for o primeiro da ft
                 #    return self.finger_table[i][1] #retornamos o addr desse
-        return self.finger_table[0][1] #se chegarmos aqui é pq nenhuma entrada da ft é 
-        #maior que o elemento a encontrar logo retornamos o ultimo addr da ft
+        return self.finger_table[0][1] # retornamos o primeiro addr da ft
         pass
     
     def refresh(self):
@@ -238,7 +241,14 @@ class DHTNode(threading.Thread):
     
         if not (contains(self.predecessor_id, self.identification, key_hash)):
             s_addr=self.finger_table.find(key_hash)
+            print("----------------------PUT--------------------------")
             print(s_addr)
+            print()
+            print()
+            print()
+            print(self.finger_table)
+            print("---------------------PUT---------------------------")
+
             self.send(s_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
         else:
             self.keystore[key] = value
@@ -255,7 +265,14 @@ class DHTNode(threading.Thread):
         
         if not (contains(self.predecessor_id, self.identification, key_hash)):
             s_addr=self.finger_table.find(key_hash)
-            self.send(self.s_addr, {"method": "GET", "args" : {"key": key, "from": address}})
+            print("----------------------GET--------------------------")
+            print(s_addr)
+            print()
+            print()
+            print()
+            print(self.finger_table)
+            print("-----------------------GET-------------------------")
+            self.send(s_addr, {"method": "GET", "args" : {"key": key, "from": address}})
         else:
             self.send(address, {"method": "ACK", "args" : self.keystore[key]})
 
@@ -314,21 +331,6 @@ class DHTNode(threading.Thread):
                     #TODO Implement processing of SUCCESSOR_REP
                     idx=self.finger_table.getIdxFromId(output["args"]["req_id"])
                     self.finger_table.update(idx,output["args"]["successor_id"],output["args"]["successor_addr"])
-                    print()
-                    print()
-                    print()
-                    print()
-                    print(self.identification)
-                    print(output["args"]["req_id"])
-                    print(idx)
-                    print(self.finger_table)
-                    print()
-                    print()
-                    print()
-                    print()
-                    print()
-                    print()
-                    print()
                     pass
             else:  # timeout occurred, lets run the stabilize algorithm
                 # Ask successor for predecessor, to start the stabilize process

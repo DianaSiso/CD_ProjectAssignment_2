@@ -56,7 +56,6 @@ def test_actual_node_finger_table(node1, node2):
 
     assert node2.identification == 752
     assert node2.successor_id == 770
-    time.sleep(15)
     assert isinstance(node1.finger_table.as_list, list)
     
     assert node1.finger_table.as_list == [
