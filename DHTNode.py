@@ -31,14 +31,20 @@ class FingerTable:
 
     def find(self, identification):
         """ Get node address of closest preceding node (in finger table) of identification. """
-        res=2^len(self.finger_table)
-        for i in range (0,len(self.finger_table),1):
-            if self.finger_table[i][0]>=identification: #procuramos o primeiro elemento superior ao procurado
-                if i>0: #se o elemento nao estiver na primeira posicao da ft
-                    return self.finger_table[i-1][1] #retornamos o addr do elemento precedente 
-                else: #se for o primeiro da ft
-                    return self.finger_table[i][1] #retornamos o addr desse
-        return self.finger_table[len(self.finger_table)-1][1] #se chegarmos aqui é pq nenhuma entrada da ft é 
+        for i in range (0,len(self.finger_table)-1,1):
+            #if (i==(len(self.finger_table)-1)):
+             #   if contains(self.finger_table[i][0], self.finger_table[0][0], identification):
+              #      return self.finger_table[i][1]
+            #else:
+            if contains(self.finger_table[i][0], self.finger_table[i+1][0], identification):
+                return self.finger_table[i][1]
+
+            #if self.finger_table[i][0]>=identification: #procuramos o primeiro elemento superior ao procurado
+             #   if i>0: #se o elemento nao estiver na primeira posicao da ft
+              #      return self.finger_table[i-1][1] #retornamos o addr do elemento precedente 
+               # else: #se for o primeiro da ft
+                #    return self.finger_table[i][1] #retornamos o addr desse
+        return self.finger_table[0][1] #se chegarmos aqui é pq nenhuma entrada da ft é 
         #maior que o elemento a encontrar logo retornamos o ultimo addr da ft
         pass
     
@@ -53,12 +59,9 @@ class FingerTable:
         pass
 
     def getIdxFromId(self, id):
-        
         for i in range (0,len(self.finger_table),1):
             if ((self.identification+2**i)%(2**len(self.finger_table)))==id:
                 return i+1
-       
-        
         pass
 
     def __repr__(self):
@@ -81,7 +84,6 @@ class DHTNode(threading.Thread):
 
     def __init__(self, address, dht_address=None, timeout=3):
         """Constructor
-
         Parameters:
             address: self's address
             dht_address: address of a node in the DHT
@@ -131,7 +133,6 @@ class DHTNode(threading.Thread):
 
     def node_join(self, args):
         """Process JOIN_REQ message.
-
         Parameters:
             args (dict): addr and id of the node trying to join
         """
@@ -164,7 +165,6 @@ class DHTNode(threading.Thread):
 
     def get_successor(self, args):
         """Process SUCCESSOR message.
-
         Parameters:
             args (dict): addr and id of the node asking
             {"id"=id; "addr" addr}
@@ -184,7 +184,6 @@ class DHTNode(threading.Thread):
     def notify(self, args):
         """Process NOTIFY message.
             Updates predecessor pointers.
-
         Parameters:
             args (dict): id and addr of the predecessor node
         """
@@ -200,7 +199,6 @@ class DHTNode(threading.Thread):
     def stabilize(self, from_id, addr):
         """Process STABILIZE protocol.
             Updates all successor pointers.
-
         Parameters:
             from_id: id of the predecessor of node with address addr
             addr: address of the node sending stabilize message
@@ -230,7 +228,6 @@ class DHTNode(threading.Thread):
         #enviamos mensagem para cada elemento
     def put(self, key, value, address):
         """Store value in DHT.
-
         Parameters:
         key: key of the data
         value: data to be stored
@@ -241,6 +238,7 @@ class DHTNode(threading.Thread):
     
         if not (contains(self.predecessor_id, self.identification, key_hash)):
             s_addr=self.finger_table.find(key_hash)
+            print(s_addr)
             self.send(s_addr, {"method": "PUT", "args": {"key": key, "value": value, "from": address}})  
         else:
             self.keystore[key] = value
@@ -248,7 +246,6 @@ class DHTNode(threading.Thread):
 
     def get(self, key, address):
         """Retrieve value from DHT.
-
         Parameters:
         key: key of the data
         address: address where to send ack/nack
@@ -257,7 +254,8 @@ class DHTNode(threading.Thread):
         self.logger.debug("Get: %s %s", key, key_hash)
         
         if not (contains(self.predecessor_id, self.identification, key_hash)):
-            self.send(self.successor_addr, {"method": "GET", "args" : {"key": key, "from": address}})
+            s_addr=self.finger_table.find(key_hash)
+            self.send(self.s_addr, {"method": "GET", "args" : {"key": key, "from": address}})
         else:
             self.send(address, {"method": "ACK", "args" : self.keystore[key]})
 

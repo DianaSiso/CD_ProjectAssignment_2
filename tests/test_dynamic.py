@@ -58,7 +58,7 @@ def test_actual_node_finger_table(node1, node2):
     assert node2.successor_id == 770
     time.sleep(15)
     assert isinstance(node1.finger_table.as_list, list)
-    print(node1.finger_table.__str__())
+    
     assert node1.finger_table.as_list == [
         (959, ("localhost", 5001)),
         (959, ("localhost", 5001)),
@@ -88,8 +88,7 @@ def test_actual_node_finger_table(node1, node2):
 def test_finger_table_used(client, node1, node2):
     assert node1.identification == 895
     assert node1.successor_id == 959
-
-
+    
     assert node2.identification == 752
     assert node2.successor_id == 770
 
